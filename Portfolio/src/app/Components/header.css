@@ -1,0 +1,76 @@
+.header {
+  position: fixed;      
+  top: 0;
+  left: 0;
+  width: 99vw;     
+  height: 50px;    
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #1a1a1a;
+  z-index: 1100;
+  box-shadow: 0px 2px 4px rgb(146, 146, 146);
+  color: #ebeaea;
+  
+}
+
+/* menu button styling */
+.menuButton {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 25px;
+}
+
+/* dropdown menu */
+.dropdown {
+  position: absolute;
+  top: 100%; /* directly below header */
+  right: 3rem;
+  min-width: 180px;
+  background-color: #222;
+  border-radius: 8px;
+  padding: 0.5rem 0;
+  display: none;
+  flex-direction: column;
+  z-index: 1200; /* above header */
+  box-shadow: 0 4px 10px rgba(242, 242, 242, 0.5);
+}
+
+.dropdown.open {
+  display: flex;
+}
+
+.dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown li a {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  transition:  0.95s;
+}
+
+.dropdown li a:hover {
+  background-color: #333;
+}
+a{
+  color: rgb(136, 148, 254);
+  text-decoration: none;
+}
+.Github, .LinkedIn{
+  margin: 0px;
+
+}

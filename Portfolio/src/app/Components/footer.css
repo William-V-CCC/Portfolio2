@@ -1,0 +1,36 @@
+.footer {
+  background: #1a1a1a;
+  color: #b1b1b1;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.8rem;
+  z-index: 1;
+}
+
+.BottomRight {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* keeps everything centered */
+  justify-content: center;
+  gap: 0.25rem; /* spacing between lines */
+  margin: 0;
+  padding: 0;
+}
+.BottomRight p,
+.BottomRight a {
+  margin: 0;        /* remove default spacing */
+  padding: 0;       /* ensure no extra padding */
+}
+
+/* Resume link styled like text, not a button */
+.BottomRight a {
+  color: rgb(136, 148, 254); /* match other links */
+  text-decoration: none; /* no underline */
+  font-weight: normal; /* same as surrounding text */
+  transition: color 0.3s;
+}
+
+.BottomRight a:hover {
+  color: rgb(100, 120, 240); /* subtle hover effect */
+}

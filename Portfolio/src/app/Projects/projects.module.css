@@ -1,0 +1,58 @@
+/* Project box wrapper */
+.projectBox {
+  margin-top: 80px; /* vertical offset from header */
+  background: radial-gradient(
+    circle at center,
+    rgb(81, 81, 81) 0%,
+    rgb(43, 43, 43) 50%,
+    rgb(15, 15, 15) 100%
+  );
+  width: 100vw;
+  height: 740px;    /* control height of project box */
+  overflow-y: auto; /* scroll vertically if projects overflow */
+  display: flex;
+  flex-direction: column; /* stack contact + projects */
+  align-items: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+/* Contact div above projects */
+.contactLinks {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #fff;
+  margin-bottom: 1rem; /* spacing between contact and grid */
+  width: 100%;
+}
+
+/* Projects grid inside the box */
+.projects {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* smaller cards */
+  gap: 1.5rem;       /* more spacing between projects */
+  justify-items: center;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 1rem;
+}
+
+/* Individual project card */
+.textBox {
+  background: rgba(20, 20, 20, 0.6);
+  color: #d6d6d6;
+  border-radius: 15px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  width: 100%;        /* fill the grid cell */
+  max-width: 280px;   /* smaller cards to prevent overlap */
+  box-sizing: border-box;
+  cursor: pointer;    /* optional: shows pointer on hover */
+}
+
+.textBox:hover {
+  box-shadow: 0 0 20px 2px white;  /* white glow on hover */
+  transform: translateY(-5px);     /* slight lift effect */
+}
