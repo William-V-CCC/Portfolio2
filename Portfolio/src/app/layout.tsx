@@ -30,6 +30,7 @@ export default function RootLayout({
           padding: 0,
           overflowX: "hidden",
           overflowY: "scroll",
+          userSelect: "none",
         }}
         className={`${geistSans.variable} ${geistMono.variable}`}
       >

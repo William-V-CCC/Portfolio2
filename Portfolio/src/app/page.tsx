@@ -1,18 +1,20 @@
 "use client";
 import { useEffect, useState } from "react";
 import styles from "./page.module.css";
-import ProjectsPage from "./Projects/page";
 
 type Project = {
-  id: number;
+  id: string;
   title: string;
   description: string;
   startDate: string;
   finishDate: string;
+  images: string[];
 };
 
-// global variable for featured IDs
-const FEATURED_PROJECT_IDS = [28, 29, 5];
+const FEATURED_PROJECT_IDS = [
+  "72187653-a6ab-411f-98d1-ce3f0c32da3c",
+  "b5ee2f04-03b2-48db-90bb-8b6a4cdce8f4",
+];
 
 export default function HomePage() {
   const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
@@ -20,38 +22,34 @@ export default function HomePage() {
   useEffect(() => {
     async function fetchFeaturedProjects() {
       try {
-        const projects: Project[] = [];
-
-        for (const id of FEATURED_PROJECT_IDS) {
-          const res = await fetch(
-            `http://localhost:4050/api/projects?id=${id}`,
-          );
-          if (!res.ok) continue; // skip if project not found
-          const data = await res.json();
-
-          // map DB fields to frontend-friendly
-          const formatted = Array.isArray(data)
-            ? data.map((item: any) => ({
-              id: item.ID,
-              title: item.Title,
-              description: item.Description,
-              startDate: item.StartDate,
-              finishDate: item.FinishDate,
-            }))
-            : [{
-              id: data.ID,
-              title: data.Title,
-              description: data.Description,
-              startDate: data.StartDate,
-              finishDate: data.FinishDate,
-            }];
-
-          projects.push(...formatted);
-        }
-
-        setFeaturedProjects(projects);
+        const projects = await Promise.all(
+          FEATURED_PROJECT_IDS.map(async (id) => {
+            try {
+              const res = await fetch(
+                `http://localhost:3050/api/projects/${id}`,
+              );
+              if (!res.ok) throw new Error(`Failed to fetch project ${id}`);
+              const data = await res.json();
+              const imagesArray = Array.isArray(data.images) ? data.images : [];
+              return {
+                id: data.id,
+                title: data.title,
+                description: data.description,
+                startDate: data.start_date,
+                finishDate: data.finish_date,
+                images: imagesArray.map((img: string) =>
+                  `http://localhost:3050${img}`
+                ),
+              };
+            } catch (err) {
+              console.error(`Error fetching project ${id}:`, err);
+              return null;
+            }
+          }),
+        );
+        setFeaturedProjects(projects.filter(Boolean) as Project[]);
       } catch (err) {
-        console.error("Error fetching featured projects:", err);
+        console.error("Unexpected error fetching projects:", err);
         setFeaturedProjects([]);
       }
     }
@@ -61,9 +59,10 @@ export default function HomePage() {
 
   return (
     <div className={styles.app}>
-      {/* Your existing header/profile/content */}
       <div className={styles.profile}>
-        <div className={styles.avatar}></div>
+        <div className={styles.avatar}>
+          <img src="./WilliamV.png" alt="My Image" />
+        </div>
         <p>William Vance</p>
       </div>
 
@@ -72,38 +71,136 @@ export default function HomePage() {
         <div className={styles.textBox}>
           <p>
             Aspiring software Developer, currently enrolled at Fort Hays State |
-            Tech . In Goodland
+            Tech. In Goodland KS
           </p>
           <br />
           <div>
-            Javascript, Typescript, HTML, CSS, Docker, Github, Firebase, MongoDB
+            <h4>Languages I Know / Am Proficient In -</h4>
+            Javascript, Typescript, HTML, CSS, Docker, Github, Firebase,
+            MongoDB, Vercel, Deno, React, NextJS, NestJS
           </div>
         </div>
       </div>
 
-      <div className={styles.ExperiencePage}>
-        {/* Experience component */}
-      </div>
+      <div className={styles.ExperiencePage}></div>
 
-      {/* Featured Projects Section */}
       <div className={styles.projectBox}>
         <h2 className={styles.featuredSectionTitle}>Current Projects</h2>
         <div className={styles.featuredProjects}>
           {featuredProjects.length > 0
             ? featuredProjects.map((proj) => (
-              <div key={proj.id} className={styles.featuredTextBox}>
-                <h3>{proj.title}</h3>
-                <p>{proj.description}</p>
-                <p className={styles.featuredCaption}>
-                  <strong>Start:</strong> {proj.startDate.split("T")[0]}
-                  <br />
-                  <strong>Finish:</strong> {proj.finishDate.split("T")[0]}
-                </p>
-              </div>
+              <ProjectCard key={proj.id} project={proj} />
             ))
             : <p className={styles.noProj}>No current projects found.</p>}
         </div>
       </div>
     </div>
+  );
+}
+
+function ProjectCard({ project }: { project: Project }) {
+  const [imgIndex, setImgIndex] = useState(0);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalImgIndex, setModalImgIndex] = useState(0);
+
+  const prevImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setImgIndex((prev) => (prev === 0 ? project.images.length - 1 : prev - 1));
+  };
+
+  const nextImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setImgIndex((prev) => (prev + 1) % project.images.length);
+  };
+
+  const openModal = (index: number) => {
+    setModalImgIndex(index);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => setModalOpen(false);
+
+  const modalPrev = () => {
+    setModalImgIndex((
+      prev,
+    ) => (prev === 0 ? project.images.length - 1 : prev - 1));
+  };
+
+  const modalNext = () => {
+    setModalImgIndex((prev) => (prev + 1) % project.images.length);
+  };
+
+  return (
+    <>
+      <div className={styles.featuredTextBox}>
+        <div className={styles.projectCardContent}>
+          {/* Image Section */}
+          <div className={styles.projectImageWrapper}>
+            {project.images.length > 0
+              ? (
+                <>
+                  {project.images.length > 1 && (
+                    <button className={styles.arrowLeft} onClick={prevImage}>
+                      &#10094;
+                    </button>
+                  )}
+                  <img
+                    src={project.images[imgIndex]}
+                    alt={project.title}
+                    className={styles.projectImageFull}
+                    onClick={() => openModal(imgIndex)}
+                  />
+                  {project.images.length > 1 && (
+                    <button className={styles.arrowRight} onClick={nextImage}>
+                      &#10095;
+                    </button>
+                  )}
+                </>
+              )
+              : <div className={styles.imagePlaceholder}>No Image</div>}
+          </div>
+
+          {/* Info Section */}
+          <div className={styles.projectInfo}>
+            <h3>{project.title}</h3>
+            <p>{project.description}</p>
+            <p className={styles.projectDates}>
+              <strong>Start:</strong> {project.startDate.split("T")[0]}
+              <br />
+              <strong>Finish:</strong> {project.finishDate.split("T")[0]}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal */}
+      {modalOpen && (
+        <div className={styles.modalOverlay} onClick={closeModal}>
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {project.images.length > 1 && (
+              <button className={styles.modalArrowLeft} onClick={modalPrev}>
+                &#10094;
+              </button>
+            )}
+            <img
+              src={project.images[modalImgIndex]}
+              alt={project.title}
+              className={styles.modalImage}
+            />
+            {project.images.length > 1 && (
+              <button className={styles.modalArrowRight} onClick={modalNext}>
+                &#10095;
+              </button>
+            )}
+            <button className={styles.modalClose} onClick={closeModal}>
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
