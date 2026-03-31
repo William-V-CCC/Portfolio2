@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import styles from "./page.module.css";
 
 type Project = {
@@ -11,9 +12,18 @@ type Project = {
   images: string[];
 };
 
+// Backend response type
+type ProjectResponse = {
+  id: string;
+  title: string;
+  description: string;
+  start_date: string;
+  finish_date: string;
+  images: string[];
+};
+
 const FEATURED_PROJECT_IDS = [
-  "72187653-a6ab-411f-98d1-ce3f0c32da3c",
-  "b5ee2f04-03b2-48db-90bb-8b6a4cdce8f4",
+  "", // Add the UUID here later
 ];
 
 export default function HomePage() {
@@ -29,7 +39,7 @@ export default function HomePage() {
                 `http://localhost:3050/api/projects/${id}`,
               );
               if (!res.ok) throw new Error(`Failed to fetch project ${id}`);
-              const data = await res.json();
+              const data: ProjectResponse = await res.json();
               const imagesArray = Array.isArray(data.images) ? data.images : [];
               return {
                 id: data.id,
@@ -37,17 +47,19 @@ export default function HomePage() {
                 description: data.description,
                 startDate: data.start_date,
                 finishDate: data.finish_date,
-                images: imagesArray.map((img: string) =>
-                  `http://localhost:3050${img}`
-                ),
-              };
+                images: imagesArray.map((img) => `http://localhost:3050${img}`),
+              } as Project;
             } catch (err) {
               console.error(`Error fetching project ${id}:`, err);
-              return null;
+              return undefined; // safely filter out later
             }
           }),
         );
-        setFeaturedProjects(projects.filter(Boolean) as Project[]);
+
+        // Filter out projects without valid id
+        setFeaturedProjects(
+          projects.filter((p): p is Project => !!p && !!p.id),
+        );
       } catch (err) {
         console.error("Unexpected error fetching projects:", err);
         setFeaturedProjects([]);
@@ -61,7 +73,7 @@ export default function HomePage() {
     <div className={styles.app}>
       <div className={styles.profile}>
         <div className={styles.avatar}>
-          <img src="./WilliamV.png" alt="My Image" />
+          <Image src="/WilliamV.png" alt="My Image" width={120} height={120} />
         </div>
         <p>William Vance</p>
       </div>
@@ -144,9 +156,11 @@ function ProjectCard({ project }: { project: Project }) {
                       &#10094;
                     </button>
                   )}
-                  <img
+                  <Image
                     src={project.images[imgIndex]}
                     alt={project.title}
+                    width={400}
+                    height={250}
                     className={styles.projectImageFull}
                     onClick={() => openModal(imgIndex)}
                   />
@@ -185,9 +199,11 @@ function ProjectCard({ project }: { project: Project }) {
                 &#10094;
               </button>
             )}
-            <img
+            <Image
               src={project.images[modalImgIndex]}
               alt={project.title}
+              width={600}
+              height={400}
               className={styles.modalImage}
             />
             {project.images.length > 1 && (
