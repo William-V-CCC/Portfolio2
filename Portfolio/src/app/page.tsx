@@ -22,7 +22,7 @@ type ProjectResponse = {
 };
 
 const FEATURED_PROJECT_IDS = [
-  "2378b3fd-6cab-4d2c-b3df-03ebbab01bb9", // adjust as needed
+  "52484de1-119a-451a-a3ac-15375125d320", // adjust as needed
 ];
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ||
