@@ -28,7 +28,8 @@ const FEATURED_PROJECT_IDS = [
 ];
 
 // Use env variable with fallback
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3050";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ||
+  "https://api.williamvance.app";
 
 export default function HomePage() {
   const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
@@ -49,7 +50,9 @@ export default function HomePage() {
                 description: data.description,
                 startDate: data.start_date,
                 finishDate: data.finish_date,
-                images: imagesArray.map((img) => `${API_URL}${img}`),
+                images: imagesArray.map((img) =>
+                  img.startsWith("http") ? img : `${API_URL}${img}`
+                ),
               } as Project;
             } catch (err) {
               console.error(`Error fetching project ${id}:`, err);
@@ -134,9 +137,9 @@ function ProjectCard({ project }: { project: Project }) {
   const closeModal = () => setModalOpen(false);
 
   const modalPrev = () => {
-    setModalImgIndex((
-      prev,
-    ) => (prev === 0 ? project.images.length - 1 : prev - 1));
+    setModalImgIndex((prev) =>
+      prev === 0 ? project.images.length - 1 : prev - 1
+    );
   };
 
   const modalNext = () => {

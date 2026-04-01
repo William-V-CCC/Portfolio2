@@ -29,11 +29,11 @@ async function bootstrap() {
     res.send(document);
   });
 
-  // Swagger UI setup
+  // Swagger UI setup with dynamic host
   SwaggerModule.setup('/api-docs', app, document, {
     customSiteTitle: 'Portfolio API Docs',
     swaggerOptions: {
-      url: 'https://www.williamvance.app/api-docs-json',
+      url: `${reqProtocol()}://${reqHost()}/api-docs-json`,
       persistAuthorization: true,
     },
     customCssUrl: 'https://unpkg.com/swagger-ui-dist/swagger-ui.css',
@@ -42,7 +42,8 @@ async function bootstrap() {
       'https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js',
     ],
   });
-// ------------------- END SWAGGER CONFIG -------------------
+
+  // ------------------- END SWAGGER CONFIG -------------------
   // ------------------- START SERVER -------------------
   const port = process.env.PORT || 3050;
   await app.listen(port, '0.0.0.0');
@@ -50,6 +51,14 @@ async function bootstrap() {
   console.log(`Server running on http://localhost:${port}`);
   console.log(`Swagger docs available at http://localhost:${port}/api-docs`);
   console.log(`Swagger JSON at http://localhost:${port}/api-docs-json`);
+}
+
+function reqProtocol() {
+  return process.env.NODE_ENV === 'production' ? 'https' : 'http';
+}
+
+function reqHost() {
+  return process.env.HOST || 'localhost:3050';
 }
 
 bootstrap();
