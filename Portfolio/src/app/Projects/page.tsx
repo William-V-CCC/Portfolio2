@@ -12,7 +12,7 @@ type Project = {
     images?: string[];
 };
 
-// ✅ use env with proper fallback
+// ✅ Use env variable with fallback
 const API_URL = process.env.NEXT_PUBLIC_API_URL ||
     "https://api.williamvance.app";
 
@@ -25,7 +25,6 @@ export default function ProjectsPage() {
     useEffect(() => {
         async function fetchProjects() {
             try {
-                // ✅ fetch from backend
                 const res = await fetch(`${API_URL}/projects`);
                 if (!res.ok) throw new Error("Failed to fetch projects");
 
@@ -39,7 +38,7 @@ export default function ProjectsPage() {
                     finishDate: item.finish_date ?? "",
                     images: Array.isArray(item.images)
                         ? item.images.map((img: string) =>
-                            img.startsWith("http") ? img : `${API_URL}${img}` // ✅ fixed image URL
+                            img.startsWith("http") ? img : `${API_URL}${img}`
                         )
                         : [],
                 }));
@@ -61,10 +60,10 @@ export default function ProjectsPage() {
     };
 
     const closeModal = () => setModalOpen(false);
-
     const prevImage = () =>
-        setModalIndex((prev) => prev === 0 ? modalImages.length - 1 : prev - 1);
-
+        setModalIndex((
+            prev,
+        ) => (prev === 0 ? modalImages.length - 1 : prev - 1));
     const nextImage = () =>
         setModalIndex((prev) => (prev + 1) % modalImages.length);
 
@@ -76,131 +75,131 @@ export default function ProjectsPage() {
 
                     <div className={styles.projects}>
                         {projects.length > 0
-                            ? projects.map((proj) => (
-                                <div
-                                    key={proj.id}
-                                    className={styles.featuredTextBox}
-                                >
-                                    <div className={styles.projectCardContent}>
-                                        {/* Left image */}
+                            ? (
+                                projects.map((proj) => (
+                                    <div
+                                        key={proj.id}
+                                        className={styles.featuredTextBox}
+                                    >
                                         <div
                                             className={styles
-                                                .projectImageWrapper}
+                                                .projectCardContent}
                                         >
-                                            {proj.images &&
-                                                    proj.images.length > 0
-                                                ? (
-                                                    <>
-                                                        {proj.images.length >
-                                                                1 && (
-                                                            <button
+                                            {/* Left image */}
+                                            <div
+                                                className={styles
+                                                    .projectImageWrapper}
+                                            >
+                                                {proj.images &&
+                                                        proj.images.length > 0
+                                                    ? (
+                                                        <>
+                                                            {proj.images
+                                                                        .length >
+                                                                    1 && (
+                                                                <button
+                                                                    className={styles
+                                                                        .arrowLeft}
+                                                                    onClick={(
+                                                                        e,
+                                                                    ) => {
+                                                                        e.stopPropagation();
+                                                                        setModalIndex(
+                                                                            (
+                                                                                prev,
+                                                                            ) => prev ===
+                                                                                    0
+                                                                                ? proj
+                                                                                    .images!
+                                                                                    .length -
+                                                                                    1
+                                                                                : prev -
+                                                                                    1,
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    &#10094;
+                                                                </button>
+                                                            )}
+
+                                                            <img
+                                                                src={proj
+                                                                    .images[0]}
+                                                                alt={proj.title}
                                                                 className={styles
-                                                                    .arrowLeft}
-                                                                onClick={(
-                                                                    e,
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    setModalIndex(
-                                                                        (
-                                                                            prev,
-                                                                        ) => prev ===
-                                                                                0
-                                                                            ? proj
-                                                                                .images!
-                                                                                .length -
-                                                                                1
-                                                                            : prev -
-                                                                                1,
-                                                                    );
+                                                                    .projectImageFull}
+                                                                onClick={() =>
                                                                     openModal(
                                                                         proj.images!,
-                                                                        modalIndex,
-                                                                    );
-                                                                }}
-                                                            >
-                                                                &#10094;
-                                                            </button>
-                                                        )}
+                                                                        0,
+                                                                    )}
+                                                            />
 
-                                                        <img
-                                                            src={proj.images[0]}
-                                                            alt={proj.title}
+                                                            {proj.images
+                                                                        .length >
+                                                                    1 && (
+                                                                <button
+                                                                    className={styles
+                                                                        .arrowRight}
+                                                                    onClick={(
+                                                                        e,
+                                                                    ) => {
+                                                                        e.stopPropagation();
+                                                                        setModalIndex(
+                                                                            (
+                                                                                prev,
+                                                                            ) => (prev +
+                                                                                1) %
+                                                                                proj.images!
+                                                                                    .length,
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    &#10095;
+                                                                </button>
+                                                            )}
+                                                        </>
+                                                    )
+                                                    : (
+                                                        <div
                                                             className={styles
-                                                                .projectImageFull}
-                                                            onClick={() =>
-                                                                openModal(
-                                                                    proj.images!,
-                                                                    0,
-                                                                )}
-                                                        />
+                                                                .imagePlaceholder}
+                                                        >
+                                                            No Image
+                                                        </div>
+                                                    )}
+                                            </div>
 
-                                                        {proj.images.length >
-                                                                1 && (
-                                                            <button
-                                                                className={styles
-                                                                    .arrowRight}
-                                                                onClick={(
-                                                                    e,
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    setModalIndex(
-                                                                        (
-                                                                            prev,
-                                                                        ) => (prev +
-                                                                            1) %
-                                                                            proj.images!
-                                                                                .length,
-                                                                    );
-                                                                    openModal(
-                                                                        proj.images!,
-                                                                        modalIndex,
-                                                                    );
-                                                                }}
-                                                            >
-                                                                &#10095;
-                                                            </button>
-                                                        )}
-                                                    </>
-                                                )
-                                                : (
-                                                    <div
-                                                        className={styles
-                                                            .imagePlaceholder}
-                                                    >
-                                                        No Image
-                                                    </div>
-                                                )}
-                                        </div>
-
-                                        {/* Right info */}
-                                        <div className={styles.projectInfo}>
-                                            <h3>{proj.title}</h3>
-                                            <p>{proj.description}</p>
-                                            <p className={styles.caption}>
-                                                {proj.startDate && (
-                                                    <>
-                                                        <strong>Start:</strong>
-                                                        {" "}
-                                                        {proj.startDate.split(
-                                                            "T",
-                                                        )[0]}
-                                                        <br />
-                                                    </>
-                                                )}
-                                                {proj.finishDate && (
-                                                    <>
-                                                        <strong>Finish:</strong>
-                                                        {" "}
-                                                        {proj.finishDate.split(
-                                                            "T",
-                                                        )[0]}
-                                                    </>
-                                                )}
-                                            </p>
+                                            {/* Right info */}
+                                            <div className={styles.projectInfo}>
+                                                <h3>{proj.title}</h3>
+                                                <p>{proj.description}</p>
+                                                <p className={styles.caption}>
+                                                    {proj.startDate && (
+                                                        <>
+                                                            <strong>
+                                                                Start:
+                                                            </strong>{" "}
+                                                            {proj.startDate
+                                                                .split("T")[0]}
+                                                            <br />
+                                                        </>
+                                                    )}
+                                                    {proj.finishDate && (
+                                                        <>
+                                                            <strong>
+                                                                Finish:
+                                                            </strong>{" "}
+                                                            {proj.finishDate
+                                                                .split("T")[0]}
+                                                        </>
+                                                    )}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))
+                                ))
+                            )
                             : (
                                 <p className={styles.noProj}>
                                     No projects found.

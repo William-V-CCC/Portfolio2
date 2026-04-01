@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import styles from "./page.module.css";
 
 type Project = {
@@ -12,6 +11,7 @@ type Project = {
   images: string[];
 };
 
+// Backend response type
 type ProjectResponse = {
   id: string;
   title: string;
@@ -22,10 +22,9 @@ type ProjectResponse = {
 };
 
 const FEATURED_PROJECT_IDS = [
-  "2378b3fd-6cab-4d2c-b3df-03ebbab01bb9",
+  "2378b3fd-6cab-4d2c-b3df-03ebbab01bb9", // adjust as needed
 ];
 
-// ✅ correct API base
 const API_URL = process.env.NEXT_PUBLIC_API_URL ||
   "https://api.williamvance.app";
 
@@ -38,14 +37,10 @@ export default function HomePage() {
         const projects = await Promise.all(
           FEATURED_PROJECT_IDS.map(async (id) => {
             try {
-              // ✅ FIX: removed /api
               const res = await fetch(`${API_URL}/projects/${id}`);
               if (!res.ok) throw new Error(`Failed to fetch project ${id}`);
-
               const data: ProjectResponse = await res.json();
-
               const imagesArray = Array.isArray(data.images) ? data.images : [];
-
               return {
                 id: data.id,
                 title: data.title,
@@ -53,7 +48,7 @@ export default function HomePage() {
                 startDate: data.start_date,
                 finishDate: data.finish_date,
                 images: imagesArray.map((img) =>
-                  img.startsWith("http") ? img : `${API_URL}${img}` // ✅ FIX: proper image URL
+                  img.startsWith("http") ? img : `${API_URL}${img}`
                 ),
               } as Project;
             } catch (err) {
@@ -63,9 +58,7 @@ export default function HomePage() {
           }),
         );
 
-        setFeaturedProjects(
-          projects.filter((p): p is Project => !!p && !!p.id),
-        );
+        setFeaturedProjects(projects.filter((p): p is Project => !!p));
       } catch (err) {
         console.error("Unexpected error fetching projects:", err);
         setFeaturedProjects([]);
@@ -79,7 +72,7 @@ export default function HomePage() {
     <div className={styles.app}>
       <div className={styles.profile}>
         <div className={styles.avatar}>
-          <Image src="/WilliamV.png" alt="My Image" width={120} height={120} />
+          <img src="/WilliamV.png" alt="My Image" width={120} height={120} />
         </div>
         <p>William Vance</p>
       </div>
@@ -106,11 +99,9 @@ export default function HomePage() {
         <h2 className={styles.featuredSectionTitle}>Current Projects</h2>
         <div className={styles.featuredProjects}>
           {featuredProjects.length > 0
-            ? (
-              featuredProjects.map((proj) => (
-                <ProjectCard key={proj.id} project={proj} />
-              ))
-            )
+            ? featuredProjects.map((proj) => (
+              <ProjectCard key={proj.id} project={proj} />
+            ))
             : <p className={styles.noProj}>No current projects found.</p>}
         </div>
       </div>
@@ -125,7 +116,7 @@ function ProjectCard({ project }: { project: Project }) {
 
   const prevImage = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    setImgIndex((prev) => prev === 0 ? project.images.length - 1 : prev - 1);
+    setImgIndex((prev) => (prev === 0 ? project.images.length - 1 : prev - 1));
   };
 
   const nextImage = (e?: React.MouseEvent) => {
@@ -140,15 +131,12 @@ function ProjectCard({ project }: { project: Project }) {
 
   const closeModal = () => setModalOpen(false);
 
-  const modalPrev = () => {
-    setModalImgIndex((prev) =>
-      prev === 0 ? project.images.length - 1 : prev - 1
-    );
-  };
-
-  const modalNext = () => {
+  const modalPrev = () =>
+    setModalImgIndex((
+      prev,
+    ) => (prev === 0 ? project.images.length - 1 : prev - 1));
+  const modalNext = () =>
     setModalImgIndex((prev) => (prev + 1) % project.images.length);
-  };
 
   return (
     <>
@@ -163,8 +151,7 @@ function ProjectCard({ project }: { project: Project }) {
                       &#10094;
                     </button>
                   )}
-
-                  <Image
+                  <img
                     src={project.images[imgIndex]}
                     alt={project.title}
                     width={400}
@@ -172,7 +159,6 @@ function ProjectCard({ project }: { project: Project }) {
                     className={styles.projectImageFull}
                     onClick={() => openModal(imgIndex)}
                   />
-
                   {project.images.length > 1 && (
                     <button className={styles.arrowRight} onClick={nextImage}>
                       &#10095;
@@ -206,21 +192,18 @@ function ProjectCard({ project }: { project: Project }) {
                 &#10094;
               </button>
             )}
-
-            <Image
+            <img
               src={project.images[modalImgIndex]}
               alt={project.title}
               width={600}
               height={400}
               className={styles.modalImage}
             />
-
             {project.images.length > 1 && (
               <button className={styles.modalArrowRight} onClick={modalNext}>
                 &#10095;
               </button>
             )}
-
             <button className={styles.modalClose} onClick={closeModal}>
               ×
             </button>
