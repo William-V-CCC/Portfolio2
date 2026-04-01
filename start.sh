@@ -1,6 +1,14 @@
 #!/bin/bash
-cd Backend
-cd backend
+
+echo "Starting backend..."
+
+cd Backend/backend || exit
+
+echo "Installing deps..."
 npm install
+
+echo "Building app..."
 npm run build
-npm start
+
+echo "Running app..."
+node dist/main.js
