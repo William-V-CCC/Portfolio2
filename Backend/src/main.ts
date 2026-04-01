@@ -3,13 +3,21 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
 import { json } from 'express';
+import * as express from 'express';
+import { join } from 'path';
 
 dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   app.enableCors();
   app.use(json());
+
+  // ------------------- SERVE UPLOADS -------------------
+  // Serve the uploads folder as static at /uploads
+  app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
+  // This will make files like /uploads/filename.png accessible
 
   // ------------------- SWAGGER CONFIG -------------------
   const config = new DocumentBuilder()
@@ -43,7 +51,6 @@ async function bootstrap() {
     ],
   });
 
-  // ------------------- END SWAGGER CONFIG -------------------
   // ------------------- START SERVER -------------------
   const port = process.env.PORT || 3050;
   await app.listen(port, '0.0.0.0');
