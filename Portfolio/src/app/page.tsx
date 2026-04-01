@@ -23,7 +23,7 @@ type ProjectResponse = {
 };
 
 const FEATURED_PROJECT_IDS = [
-  "", // Add the UUID here later
+  "344db24f-2b59-474d-9263-9db9bb9d6efd", // Add the UUID here later
 ];
 
 export default function HomePage() {
