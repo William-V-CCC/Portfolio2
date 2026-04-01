@@ -22,9 +22,13 @@ type ProjectResponse = {
   images: string[];
 };
 
+// Add your project UUIDs here
 const FEATURED_PROJECT_IDS = [
-  "344db24f-2b59-474d-9263-9db9bb9d6efd", // Add the UUID here later
+  "344db24f-2b59-474d-9263-9db9bb9d6efd",
 ];
+
+// Use env variable with fallback
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3050";
 
 export default function HomePage() {
   const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
@@ -35,9 +39,7 @@ export default function HomePage() {
         const projects = await Promise.all(
           FEATURED_PROJECT_IDS.map(async (id) => {
             try {
-              const res = await fetch(
-                `http://localhost:3050/api/projects/${id}`,
-              );
+              const res = await fetch(`${API_URL}/api/projects/${id}`);
               if (!res.ok) throw new Error(`Failed to fetch project ${id}`);
               const data: ProjectResponse = await res.json();
               const imagesArray = Array.isArray(data.images) ? data.images : [];
@@ -47,7 +49,7 @@ export default function HomePage() {
                 description: data.description,
                 startDate: data.start_date,
                 finishDate: data.finish_date,
-                images: imagesArray.map((img) => `http://localhost:3050${img}`),
+                images: imagesArray.map((img) => `${API_URL}${img}`),
               } as Project;
             } catch (err) {
               console.error(`Error fetching project ${id}:`, err);
@@ -56,7 +58,6 @@ export default function HomePage() {
           }),
         );
 
-        // Filter out projects without valid id
         setFeaturedProjects(
           projects.filter((p): p is Project => !!p && !!p.id),
         );
@@ -146,7 +147,6 @@ function ProjectCard({ project }: { project: Project }) {
     <>
       <div className={styles.featuredTextBox}>
         <div className={styles.projectCardContent}>
-          {/* Image Section */}
           <div className={styles.projectImageWrapper}>
             {project.images.length > 0
               ? (
@@ -174,7 +174,6 @@ function ProjectCard({ project }: { project: Project }) {
               : <div className={styles.imagePlaceholder}>No Image</div>}
           </div>
 
-          {/* Info Section */}
           <div className={styles.projectInfo}>
             <h3>{project.title}</h3>
             <p>{project.description}</p>
@@ -187,7 +186,6 @@ function ProjectCard({ project }: { project: Project }) {
         </div>
       </div>
 
-      {/* Modal */}
       {modalOpen && (
         <div className={styles.modalOverlay} onClick={closeModal}>
           <div
