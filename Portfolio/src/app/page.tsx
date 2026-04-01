@@ -12,7 +12,6 @@ type Project = {
   images: string[];
 };
 
-// Backend response type
 type ProjectResponse = {
   id: string;
   title: string;
@@ -22,12 +21,11 @@ type ProjectResponse = {
   images: string[];
 };
 
-// Add your project UUIDs here
 const FEATURED_PROJECT_IDS = [
-  "344db24f-2b59-474d-9263-9db9bb9d6efd",
+  "2378b3fd-6cab-4d2c-b3df-03ebbab01bb9",
 ];
 
-// Use env variable with fallback
+// ✅ correct API base
 const API_URL = process.env.NEXT_PUBLIC_API_URL ||
   "https://api.williamvance.app";
 
@@ -40,11 +38,14 @@ export default function HomePage() {
         const projects = await Promise.all(
           FEATURED_PROJECT_IDS.map(async (id) => {
             try {
-              // ✅ FIXED: removed /api
+              // ✅ FIX: removed /api
               const res = await fetch(`${API_URL}/projects/${id}`);
               if (!res.ok) throw new Error(`Failed to fetch project ${id}`);
+
               const data: ProjectResponse = await res.json();
+
               const imagesArray = Array.isArray(data.images) ? data.images : [];
+
               return {
                 id: data.id,
                 title: data.title,
@@ -52,12 +53,12 @@ export default function HomePage() {
                 startDate: data.start_date,
                 finishDate: data.finish_date,
                 images: imagesArray.map((img) =>
-                  img.startsWith("http") ? img : `${API_URL}${img}`
+                  img.startsWith("http") ? img : `${API_URL}${img}` // ✅ FIX: proper image URL
                 ),
               } as Project;
             } catch (err) {
               console.error(`Error fetching project ${id}:`, err);
-              return undefined; // safely filter out later
+              return undefined;
             }
           }),
         );
@@ -105,9 +106,11 @@ export default function HomePage() {
         <h2 className={styles.featuredSectionTitle}>Current Projects</h2>
         <div className={styles.featuredProjects}>
           {featuredProjects.length > 0
-            ? featuredProjects.map((proj) => (
-              <ProjectCard key={proj.id} project={proj} />
-            ))
+            ? (
+              featuredProjects.map((proj) => (
+                <ProjectCard key={proj.id} project={proj} />
+              ))
+            )
             : <p className={styles.noProj}>No current projects found.</p>}
         </div>
       </div>
@@ -122,7 +125,7 @@ function ProjectCard({ project }: { project: Project }) {
 
   const prevImage = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    setImgIndex((prev) => (prev === 0 ? project.images.length - 1 : prev - 1));
+    setImgIndex((prev) => prev === 0 ? project.images.length - 1 : prev - 1);
   };
 
   const nextImage = (e?: React.MouseEvent) => {
@@ -160,6 +163,7 @@ function ProjectCard({ project }: { project: Project }) {
                       &#10094;
                     </button>
                   )}
+
                   <Image
                     src={project.images[imgIndex]}
                     alt={project.title}
@@ -168,6 +172,7 @@ function ProjectCard({ project }: { project: Project }) {
                     className={styles.projectImageFull}
                     onClick={() => openModal(imgIndex)}
                   />
+
                   {project.images.length > 1 && (
                     <button className={styles.arrowRight} onClick={nextImage}>
                       &#10095;
@@ -201,6 +206,7 @@ function ProjectCard({ project }: { project: Project }) {
                 &#10094;
               </button>
             )}
+
             <Image
               src={project.images[modalImgIndex]}
               alt={project.title}
@@ -208,11 +214,13 @@ function ProjectCard({ project }: { project: Project }) {
               height={400}
               className={styles.modalImage}
             />
+
             {project.images.length > 1 && (
               <button className={styles.modalArrowRight} onClick={modalNext}>
                 &#10095;
               </button>
             )}
+
             <button className={styles.modalClose} onClick={closeModal}>
               ×
             </button>
