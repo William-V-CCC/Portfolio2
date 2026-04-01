@@ -4,13 +4,17 @@ import styles from "./projects.module.css";
 import Footer from "../Components/Footer";
 
 type Project = {
-    id: string; // UUID
+    id: string;
     title: string;
     description: string;
     startDate?: string;
     finishDate?: string;
     images?: string[];
 };
+
+// ✅ use env with proper fallback
+const API_URL = process.env.NEXT_PUBLIC_API_URL ||
+    "https://api.williamvance.app";
 
 export default function ProjectsPage() {
     const [projects, setProjects] = useState<Project[]>([]);
@@ -21,7 +25,8 @@ export default function ProjectsPage() {
     useEffect(() => {
         async function fetchProjects() {
             try {
-                const res = await fetch("http://localhost:3050/api/projects");
+                // ✅ FIXED: removed localhost + removed /api
+                const res = await fetch(`${API_URL}/projects`);
                 if (!res.ok) throw new Error("Failed to fetch projects");
 
                 const data = await res.json();
@@ -34,7 +39,7 @@ export default function ProjectsPage() {
                     finishDate: item.finish_date ?? "",
                     images: Array.isArray(item.images)
                         ? item.images.map((img: string) =>
-                            `http://localhost:3050${img}`
+                            img.startsWith("http") ? img : `${API_URL}${img}` // ✅ FIXED image URL
                         )
                         : [],
                 }));
@@ -58,9 +63,8 @@ export default function ProjectsPage() {
     const closeModal = () => setModalOpen(false);
 
     const prevImage = () =>
-        setModalIndex((
-            prev,
-        ) => (prev === 0 ? modalImages.length - 1 : prev - 1));
+        setModalIndex((prev) => prev === 0 ? modalImages.length - 1 : prev - 1);
+
     const nextImage = () =>
         setModalIndex((prev) => (prev + 1) % modalImages.length);
 
@@ -82,7 +86,6 @@ export default function ProjectsPage() {
                                             className={styles
                                                 .projectCardContent}
                                         >
-                                            {/* Left image */}
                                             <div
                                                 className={styles
                                                     .projectImageWrapper}
@@ -167,7 +170,6 @@ export default function ProjectsPage() {
                                                     )}
                                             </div>
 
-                                            {/* Right info */}
                                             <div className={styles.projectInfo}>
                                                 <h3>{proj.title}</h3>
                                                 <p>{proj.description}</p>

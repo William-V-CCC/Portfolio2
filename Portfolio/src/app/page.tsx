@@ -40,7 +40,8 @@ export default function HomePage() {
         const projects = await Promise.all(
           FEATURED_PROJECT_IDS.map(async (id) => {
             try {
-              const res = await fetch(`${API_URL}/api/projects/${id}`);
+              // ✅ FIXED: removed /api
+              const res = await fetch(`${API_URL}/projects/${id}`);
               if (!res.ok) throw new Error(`Failed to fetch project ${id}`);
               const data: ProjectResponse = await res.json();
               const imagesArray = Array.isArray(data.images) ? data.images : [];
